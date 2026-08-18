@@ -1,0 +1,19 @@
+# Local credentials and login artifacts
+*.data
+*.data.*
+qrcode.png
+
+# Local binaries and build outputs
+BBDown.exe
+BBDown_login_fixed.exe
+aria2c.exe
+ffmpeg.exe
+mp4decrypt.exe
+BBDown_login_fixed_build/
+.tmp-*
+__pycache__/
+*.zip
+
+# .NET build outputs
+src/BBDown/**/bin/
+src/BBDown/**/obj/
