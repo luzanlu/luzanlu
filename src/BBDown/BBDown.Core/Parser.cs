@@ -243,17 +243,20 @@ public static partial class Parser
             {
                 foreach (var node in video)
                 {
-                    var urlList = new List<string>() { node.GetProperty("base_url").ToString() };
+                    var baseUrl = node.GetProperty("base_url").ToString();
+                    var urlList = new List<string>() { baseUrl };
                     if (node.TryGetProperty("backup_url", out JsonElement element) && element.ValueKind != JsonValueKind.Null)
                     {
                         urlList.AddRange(element.EnumerateArray().Select(i => i.ToString()));
                     }
                     var videoId = node.GetProperty("id").ToString();
+                    var isSdrEnhanced = !tvApi && !appApi && videoId == "120" &&
+                        baseUrl.Contains("_sr1-", StringComparison.OrdinalIgnoreCase);
                     Video v = new()
                     {
                         dur = pDur,
                         id = videoId,
-                        dfn = Config.qualitys[videoId],
+                        dfn = isSdrEnhanced ? "4K SDR\u589e\u5f3a" : Config.qualitys[videoId],
                         bandwith = Convert.ToInt64(node.GetProperty("bandwidth").ToString()) / 1000,
                         baseUrl = urlList.FirstOrDefault(i => !BaseUrlRegex().IsMatch(i), urlList.First()),
                         codecs = GetVideoCodec(node.GetProperty("codecid").ToString()),
