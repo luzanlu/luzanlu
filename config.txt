@@ -1,0 +1,74 @@
+# BBDown Python 配置文件
+# 修改后保存即可生效，或通过 --config-file 指定其他路径
+
+# 混流时音频语言代码 (chi/jpn/eng等)
+language = chi
+
+# User-Agent (留空则随机)
+user_agent =
+
+# aria2c 附加参数
+aria2c_args = -x16 -s16 -j16 -k 5M
+
+# 工作目录 (留空则当前目录)
+work_dir =
+
+# ffmpeg 路径 (留空则自动查找)
+ffmpeg_path =
+
+# 自定义 upos 服务器
+upos_host =
+
+# 合并时强制替换下载服务器host (0=关闭 1=开启, 默认 1)
+force_replace_host = 1
+
+# 下载合集分P间隔 (秒, 默认0)
+delay_per_page = 0
+
+# 自定义 B站 API host (用于代理)
+host =
+
+# 自定义 PGC API host
+ep_host =
+
+# 自定义 TV API host
+tv_host =
+
+# 区域 (hk|tw|th)
+area =
+
+# 国际版 Cookie
+intl_cookie =
+
+# 使用 aria2c 下载 (0=关闭 1=开启, 默认 1)
+use_aria2c = 1
+
+# 使用 MP4Box 混流 (0=关闭 1=开启, 默认 0)
+use_mp4box = 0
+
+# 多线程下载 (0=关闭 1=开启, 默认 1)
+multi_thread = 1
+
+# 写入元数据到视频容器 (0=关闭 1=开启, 默认 0)
+write_metadata = 0
+
+# 写入章节信息 (0=关闭 1=开启, 默认 1)
+write_chapter = 1
+
+# 隐藏音视频流列表 (0=关闭 1=开启, 默认 0)
+hide_streams = 0
+
+# 下载限速 (KB/s, 0=不限速)
+download_speed_limit = 0
+
+# 视频CDN切换阈值 (MB/s, 低于此速度切换节点, 0=不切换, 默认1)
+video_cdn_threshold = 1
+
+# 音频CDN切换阈值 (MB/s, 独立于视频, 0=不切换, 默认1)
+audio_cdn_threshold = 1
+
+# 字幕导出格式 (srt/lrc/txt/ass/json)
+subtitle_format = srt
+
+# 下载封面并混入视频 (0=关闭 1=开启, 默认 1)
+cover_download = 1

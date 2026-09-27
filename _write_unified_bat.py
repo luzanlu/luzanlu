@@ -99,8 +99,15 @@ if "!MODE_FLAG!"=="-tv" (
 echo.
 
 set "v_count=0"
-for /f "tokens=2,4,6,8 delims=[]" %%A in ('type _temp_quality.txt ^| findstr /C:"] ["') do (
-    if not "%%D"=="" (
+rem 兼容旧版 [画质][编码][码率][大小] 与新版 [画质][分辨率][编码][帧率][码率][大小]
+for /f "tokens=2,4,6,8,10,12 delims=[]" %%A in ('type _temp_quality.txt ^| findstr /C:"] ["') do (
+    if not "%%F"=="" (
+        set "val_dfn_!v_count!=%%A"
+        set "val_enc_!v_count!=%%C"
+        set "val_rate_!v_count!=%%E"
+        set "val_size_!v_count!=%%F"
+        set /a v_count+=1
+    ) else if not "%%D"=="" (
         set "val_dfn_!v_count!=%%A"
         set "val_enc_!v_count!=%%B"
         set "val_rate_!v_count!=%%C"
@@ -278,13 +285,8 @@ goto SelectMode
 :LoginWEB
 echo.
 echo 正在启动 WEB 端扫码登录...
-if not exist "%~dp0BBDown_login_fixed.exe" (
-    echo [错误] 缺少 BBDown_login_fixed.exe
-    echo.
-    goto SelectMode
-)
 pushd "%~dp0"
-"%~dp0BBDown_login_fixed.exe" login
+"%~dp0BBDown.exe" login
 set "LOGIN_RC=!errorlevel!"
 popd
 if not "!LOGIN_RC!"=="0" (

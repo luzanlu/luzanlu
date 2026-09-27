@@ -17,3 +17,7 @@ __pycache__/
 # .NET build outputs
 src/BBDown/**/bin/
 src/BBDown/**/obj/
+
+# Third-party tool downloads (not part of BBDown source)
+Bili23-Downloader*.exe
+Bili23抢先版/

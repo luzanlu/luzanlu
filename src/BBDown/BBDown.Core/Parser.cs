@@ -189,11 +189,58 @@ public static partial class Parser
             try { pDur = root.GetProperty("dash").GetProperty("duration").GetInt32(); } catch { }
             try { pDur = root.GetProperty("timelength").GetInt32() / 1000; } catch { }
 
+            var qnsToParse = new Queue<string>();
+            var requestedQns = new HashSet<string>(StringComparer.Ordinal) { qn };
+
+            void QueueQn(string requestedQn)
+            {
+                if (requestedQns.Add(requestedQn)) qnsToParse.Enqueue(requestedQn);
+            }
+
+            if (!appApi)
+            {
+                if (tvApi)
+                {
+                    QueueQn(GetMaxQn());
+                }
+                else
+                {
+                    if (root.GetProperty("dash").TryGetProperty("video", out JsonElement initialVideos))
+                    {
+                        foreach (var videoNode in initialVideos.EnumerateArray())
+                        {
+                            requestedQns.Add(videoNode.GetProperty("id").ToString());
+                        }
+                    }
+
+                    if (root.TryGetProperty("accept_quality", out JsonElement acceptQuality))
+                    {
+                        foreach (var qualityNode in acceptQuality.EnumerateArray())
+                        {
+                            QueueQn(qualityNode.ToString());
+                        }
+                    }
+                    else if (root.TryGetProperty("support_formats", out JsonElement supportFormats))
+                    {
+                        foreach (var formatNode in supportFormats.EnumerateArray())
+                        {
+                            QueueQn(formatNode.GetProperty("quality").ToString());
+                        }
+                    }
+
+                    if (qnsToParse.Count == 0)
+                    {
+                        QueueQn(GetMaxQn());
+                        QueueQn("120");
+                    }
+                }
+            }
+
             bool reParse = false;
             reParse:
             if (reParse)
             {
-                parsedResult.WebJsonString = await GetPlayJsonAsync(encoding, aidOri, aid, cid, epId, tvApi, intlApi, appApi, GetMaxQn());
+                parsedResult.WebJsonString = await GetPlayJsonAsync(encoding, aidOri, aid, cid, epId, tvApi, intlApi, appApi, qnsToParse.Dequeue());
                 respJson = JsonDocument.Parse(parsedResult.WebJsonString);
                 data = respJson.RootElement;
                 root = nodeName == null ? data : nodeName == "video_info" ? data.GetProperty("result").GetProperty(nodeName) : data.GetProperty(nodeName);
@@ -267,12 +314,17 @@ public static partial class Parser
                         v.res = node.GetProperty("width").ToString() + "x" + node.GetProperty("height").ToString();
                         v.fps = node.GetProperty("frame_rate").ToString();
                     }
-                    if (!parsedResult.VideoTracks.Contains(v)) parsedResult.VideoTracks.Add(v);
+                    if (!parsedResult.VideoTracks.Any(track =>
+                        track.id == v.id && track.dfn == v.dfn && track.codecs == v.codecs &&
+                        track.res == v.res && track.fps == v.fps))
+                    {
+                        parsedResult.VideoTracks.Add(v);
+                    }
                 }
             }
 
-            //此处处理免二压视频，需要单独再请求一次
-            if (!reParse && !appApi)
+            // WEB 每个画质接口只返回对应档位，按接口声明的全部画质逐档合并。
+            if (qnsToParse.Count > 0)
             {
                 reParse = true;
                 goto reParse;
