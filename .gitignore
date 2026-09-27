@@ -21,3 +21,4 @@ src/BBDown/**/obj/
 # Third-party tool downloads (not part of BBDown source)
 Bili23-Downloader*.exe
 Bili23抢先版/
+main_*.exe
